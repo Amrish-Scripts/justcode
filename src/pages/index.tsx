@@ -17,6 +17,7 @@ export default function Home() {
     order: 0,
     likes: 0,
     dislikes: 0,
+    company: "",
     companies: [] as string[],
   });
 

@@ -161,6 +161,8 @@ const Topbar: React.FC<TopbarProps> = ({ problemPage, setShowForm }) => {
 			await updateDoc(companiesRef, {
 				names: arrayUnion(companyName.toUpperCase())
 			});
+      // Force refresh the page to show new company
+      window.location.reload();
 		} catch (error) {
 			console.error('Error adding company:', error);
 		}
