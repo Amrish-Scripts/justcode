@@ -40,13 +40,13 @@ const CompanyForm: React.FC<CompanyFormProps> = ({ isOpen, onClose, onSubmit }) 
     founded: ''
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     onSubmit(companyDetails.name);
 
     // Store detailed company information
     const companyDocRef = doc(firestore, 'companiesDetails', companyDetails.name.toUpperCase());
-    setDoc(companyDocRef, {
+    await setDoc(companyDocRef, {
       ...companyDetails,
       name: companyDetails.name.toUpperCase(),
       createdAt: new Date().toISOString()
@@ -59,6 +59,8 @@ const CompanyForm: React.FC<CompanyFormProps> = ({ isOpen, onClose, onSubmit }) 
       founded: ''
     });
     onClose();
+    // Refresh the page data without full reload
+    window.dispatchEvent(new CustomEvent('refreshData'));
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
