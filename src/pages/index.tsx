@@ -30,13 +30,8 @@ export default function Home() {
       try {
         const companiesRef = collection(firestore, 'companiesDetails');
         const companiesSnapshot = await getDocs(companiesRef);
-        const companiesList = companiesSnapshot.docs.map(doc => ({
-          name: doc.data().name,
-          description: doc.data().description,
-          website: doc.data().website,
-          founded: doc.data().founded
-        }));
-        setCompanies(companiesList.map(company => company.name) || []);
+        const companiesList = companiesSnapshot.docs.map(doc => doc.data().name);
+        setCompanies(companiesList || []);
       } catch (error) {
         console.error('Error fetching companies:', error);
       }
@@ -145,9 +140,11 @@ export default function Home() {
                 value={inputs.company}
               >
                 <option value="general">General</option>
-                <option value="TCS">TCS</option>
-                <option value="AMAZON">AMAZON</option>
-                <option value="DELOITTE">DELOITTE</option>
+                {companies.map((company) => (
+                  <option key={company} value={company}>
+                    {company}
+                  </option>
+                ))}
               </select>
               <button className='bg-blue-500 text-white px-4 py-2 rounded'>Save to DB</button>
               <button type='button' onClick={() => setShowForm(false)} className='ml-2 bg-red-500 text-white px-4 py-2 rounded'>Cancel</button>
