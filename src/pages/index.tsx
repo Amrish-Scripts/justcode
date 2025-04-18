@@ -18,7 +18,6 @@ export default function Home() {
     likes: 0,
     dislikes: 0,
     company: "",
-    companies: [] as string[],
   });
 
   const [showForm, setShowForm] = useState(false);

@@ -158,10 +158,15 @@ const Topbar: React.FC<TopbarProps> = ({ problemPage, setShowForm }) => {
 	const handleAddCompany = async (companyName: string) => {
 		try {
 			const companiesRef = doc(firestore, 'companies', 'list');
-			await updateDoc(companiesRef, {
-				names: arrayUnion(companyName.toUpperCase())
-			});
-      // Force refresh the page to show new company
+			const companiesDoc = await getDoc(companiesRef);
+			
+			if (!companiesDoc.exists()) {
+				await setDoc(companiesRef, { names: [companyName.toUpperCase()] });
+			} else {
+				await updateDoc(companiesRef, {
+					names: arrayUnion(companyName.toUpperCase())
+				});
+			}
       window.location.reload();
 		} catch (error) {
 			console.error('Error adding company:', error);
