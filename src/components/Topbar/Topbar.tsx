@@ -1,6 +1,6 @@
-import { auth } from "@/firebase/firebase";
+import { auth, firestore } from "@/firebase/firebase";
 import Link from "next/link";
-import React from "react";
+import React, { useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import Logout from "../Buttons/Logout";
 import { useSetRecoilState } from "recoil";
@@ -12,16 +12,69 @@ import Timer from "../Timer/Timer";
 import { useRouter } from "next/router";
 import { problems } from "@/utils/problems";
 import { Problem } from "@/utils/types/problem";
+import { doc, updateDoc, arrayUnion } from "firebase/firestore";
 
 type TopbarProps = {
 	problemPage?: boolean;
 	setShowForm?: () => void;
 };
 
+type CompanyFormProps = {
+  isOpen: boolean;
+  onClose: () => void;
+  onSubmit: (companyName: string) => void;
+};
+
+const CompanyForm: React.FC<CompanyFormProps> = ({ isOpen, onClose, onSubmit }) => {
+  const [companyName, setCompanyName] = useState('');
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSubmit(companyName);
+    setCompanyName('');
+    onClose();
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50'>
+      <div className='bg-white p-6 rounded shadow-lg'>
+        <form onSubmit={handleSubmit}>
+          <input
+            type='text'
+            value={companyName}
+            onChange={(e) => setCompanyName(e.target.value)}
+            placeholder='Company Name'
+            className='w-full mb-2 p-2 border rounded text-black'
+            required
+          />
+          <div className='flex justify-end gap-2'>
+            <button
+              type='button'
+              onClick={onClose}
+              className='px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600'
+            >
+              Cancel
+            </button>
+            <button
+              type='submit'
+              className='px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600'
+            >
+              Add Company
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+
 const Topbar: React.FC<TopbarProps> = ({ problemPage, setShowForm }) => {
 	const [user] = useAuthState(auth);
 	const setAuthModalState = useSetRecoilState(authModalState);
 	const router = useRouter();
+	const [showCompanyForm, setShowCompanyForm] = useState(false);
 
 	const isAdmin = user?.email === "admin@gmail.com";
 
@@ -41,6 +94,17 @@ const Topbar: React.FC<TopbarProps> = ({ problemPage, setShowForm }) => {
 			router.push(`/problems/${lastProblemKey}`);
 		} else {
 			router.push(`/problems/${nextProblemKey}`);
+		}
+	};
+
+	const handleAddCompany = async (companyName: string) => {
+		try {
+			const companiesRef = doc(firestore, 'companies', 'list');
+			await updateDoc(companiesRef, {
+				names: arrayUnion(companyName.toUpperCase())
+			});
+		} catch (error) {
+			console.error('Error adding company:', error);
 		}
 	};
 
@@ -126,8 +190,19 @@ const Topbar: React.FC<TopbarProps> = ({ problemPage, setShowForm }) => {
 							Add Problem
 						</button>
 					)}
+					<button
+						className='bg-dark-fill-3 py-1.5 px-3 cursor-pointer rounded text-brand-orange hover:bg-dark-fill-2'
+						onClick={() => setShowCompanyForm(true)}
+					>
+						Add Company
+					</button>
 				</div>
 			</div>
+			<CompanyForm
+				isOpen={showCompanyForm}
+				onClose={() => setShowCompanyForm(false)}
+				onSubmit={handleAddCompany}
+			/>
 		</nav>
 	);
 };

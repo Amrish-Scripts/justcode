@@ -46,6 +46,22 @@ export default function Home() {
     setShowForm(false);
   };
 
+  const [companies, setCompanies] = useState<string[]>(['TCS', 'AMAZON', 'DELOITTE']);
+
+  useEffect(() => {
+    const fetchCompanies = async () => {
+      try {
+        const companiesDoc = await getDoc(doc(firestore, 'companies', 'list'));
+        if (companiesDoc.exists()) {
+          setCompanies(companiesDoc.data().names);
+        }
+      } catch (error) {
+        console.error('Error fetching companies:', error);
+      }
+    };
+    fetchCompanies();
+  }, []);
+
   return (
     <>
       <main className='bg-dark-layer-2 min-h-screen relative'>
@@ -54,16 +70,16 @@ export default function Home() {
           <h2 className='text-2xl text-center text-gray-700 dark:text-gray-400 font-medium uppercase mt-10 mb-5'>
             Companies
           </h2>
-          <div className='flex justify-center gap-4 mb-8'>
-            <Link href='/company/tcs' className='bg-dark-layer-1 hover:bg-dark-layer-2 text-gray-400 px-6 py-3 rounded'>
-              TCS
-            </Link>
-            <Link href='/company/amazon' className='bg-dark-layer-1 hover:bg-dark-layer-2 text-gray-400 px-6 py-3 rounded'>
-              AMAZON
-            </Link>
-            <Link href='/company/deloitte' className='bg-dark-layer-1 hover:bg-dark-layer-2 text-gray-400 px-6 py-3 rounded'>
-              DELOITTE
-            </Link>
+          <div className='flex justify-center gap-4 mb-8 flex-wrap'>
+            {companies.map((company) => (
+              <Link
+                key={company}
+                href={`/company/${company.toLowerCase()}`}
+                className='bg-dark-layer-1 hover:bg-dark-layer-2 text-gray-400 px-6 py-3 rounded'
+              >
+                {company}
+              </Link>
+            ))}
           </div>
           <h1 className='text-2xl text-center text-gray-700 dark:text-gray-400 font-medium uppercase mb-5'>
             Problem List
