@@ -3,7 +3,8 @@ import ProblemsTable from "@/components/ProblemsTable/ProblemsTable";
 import Topbar from "@/components/Topbar/Topbar";
 import { firestore } from "@/firebase/firebase";
 import useHasMounted from "@/hooks/useHasMounted";
-import { doc, setDoc, collection, getDocs, deleteDoc } from "firebase/firestore";
+import { doc, setDoc, collection, getDocs, deleteDoc, query, orderBy } from "firebase/firestore";
+import { DBProblem } from "@/utils/types/problem";
 import { ChangeEvent, useState, useEffect } from "react";
 
 export default function Home() {
@@ -23,6 +24,32 @@ export default function Home() {
   const [showForm, setShowForm] = useState(false);
   const [loadingProblems, setLoadingProblems] = useState(true);
   const [companies, setCompanies] = useState<string[]>([]);
+  const [showDeleteProblemModal, setShowDeleteProblemModal] = useState(false);
+  const [selectedProblems, setSelectedProblems] = useState<string[]>([]);
+  const [problems, setProblems] = useState<DBProblem[]>([]);
+
+  useEffect(() => {
+    const fetchProblems = async () => {
+      const q = query(collection(firestore, "problems"), orderBy("order", "asc"));
+      const querySnapshot = await getDocs(q);
+      const problemsList = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as DBProblem));
+      setProblems(problemsList);
+    };
+    fetchProblems();
+  }, []);
+
+  const handleDeleteProblems = async () => {
+    try {
+      for (const problemId of selectedProblems) {
+        await deleteDoc(doc(firestore, 'problems', problemId));
+      }
+      setShowDeleteProblemModal(false);
+      setSelectedProblems([]);
+      window.location.reload();
+    } catch (error) {
+      console.error('Error deleting problems:', error);
+    }
+  };
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedCompanies, setSelectedCompanies] = useState<string[]>([]);
   const hasMounted = useHasMounted();
@@ -153,10 +180,66 @@ export default function Home() {
               </Link>
             ))}
           </div>
-          <h1 className='text-2xl text-center text-gray-700 dark:text-gray-400 font-medium uppercase mb-5'>
-            Problem List
-          </h1>
+          <div className='flex justify-between items-center mb-5'>
+            <h1 className='text-2xl text-gray-700 dark:text-gray-400 font-medium uppercase'>
+              Problem List
+            </h1>
+            <button
+              onClick={() => setShowDeleteProblemModal(true)}
+              className='bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded'
+            >
+              Delete Problem
+            </button>
+          </div>
         </div>
+
+        {/* Delete Problems Modal */}
+        {showDeleteProblemModal && (
+          <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50'>
+            <div className='bg-white p-6 rounded shadow-lg w-96'>
+              <h3 className='text-lg font-medium mb-4 text-gray-900'>Select Problems to Delete</h3>
+              <div className='max-h-60 overflow-y-auto'>
+                {problems.map((problem) => (
+                  <div key={problem.id} className='flex items-center mb-2'>
+                    <input
+                      type='checkbox'
+                      id={problem.id}
+                      value={problem.id}
+                      checked={selectedProblems.includes(problem.id)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setSelectedProblems([...selectedProblems, problem.id]);
+                        } else {
+                          setSelectedProblems(selectedProblems.filter(id => id !== problem.id));
+                        }
+                      }}
+                      className='mr-2'
+                    />
+                    <label htmlFor={problem.id} className='text-gray-900'>{problem.title}</label>
+                  </div>
+                ))}
+              </div>
+              <div className='flex justify-end gap-2 mt-4'>
+                <button
+                  onClick={() => {
+                    setShowDeleteProblemModal(false);
+                    setSelectedProblems([]);
+                  }}
+                  className='bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded'
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleDeleteProblems}
+                  className='bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded'
+                  disabled={selectedProblems.length === 0}
+                >
+                  Delete Selected
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className='relative overflow-x-auto mx-auto px-6 pb-10'>
           {loadingProblems && (
