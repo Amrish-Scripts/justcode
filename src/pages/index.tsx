@@ -3,7 +3,7 @@ import ProblemsTable from "@/components/ProblemsTable/ProblemsTable";
 import Topbar from "@/components/Topbar/Topbar";
 import { firestore } from "@/firebase/firebase";
 import useHasMounted from "@/hooks/useHasMounted";
-import { doc, setDoc, collection, getDocs } from "firebase/firestore";
+import { doc, setDoc, collection, getDocs, deleteDoc } from "firebase/firestore";
 import { ChangeEvent, useState, useEffect } from "react";
 
 export default function Home() {
@@ -23,7 +23,22 @@ export default function Home() {
   const [showForm, setShowForm] = useState(false);
   const [loadingProblems, setLoadingProblems] = useState(true);
   const [companies, setCompanies] = useState<string[]>([]);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [selectedCompanies, setSelectedCompanies] = useState<string[]>([]);
   const hasMounted = useHasMounted();
+
+  const handleDeleteCompanies = async () => {
+    try {
+      for (const company of selectedCompanies) {
+        await deleteDoc(doc(firestore, 'companiesDetails', company));
+      }
+      setShowDeleteModal(false);
+      setSelectedCompanies([]);
+      window.location.reload();
+    } catch (error) {
+      console.error('Error deleting companies:', error);
+    }
+  };
 
   useEffect(() => {
     const fetchCompanies = async () => {
@@ -68,9 +83,65 @@ export default function Home() {
       <main className='bg-dark-layer-2 min-h-screen relative'>
         <Topbar setShowForm={() => setShowForm(true)} />
         <div className='max-w-[1200px] mx-auto px-6'>
-          <h2 className='text-2xl text-center text-gray-700 dark:text-gray-400 font-medium uppercase mt-10 mb-5'>
-            Companies
-          </h2>
+          <div className='flex justify-between items-center mt-10 mb-5'>
+            <h2 className='text-2xl text-gray-700 dark:text-gray-400 font-medium uppercase'>
+              Companies
+            </h2>
+            <button
+              onClick={() => setShowDeleteModal(true)}
+              className='bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded'
+            >
+              Delete Companies
+            </button>
+          </div>
+
+          {/* Delete Companies Modal */}
+          {showDeleteModal && (
+            <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50'>
+              <div className='bg-white p-6 rounded shadow-lg w-96'>
+                <h3 className='text-lg font-medium mb-4 text-gray-900'>Select Companies to Delete</h3>
+                <div className='max-h-60 overflow-y-auto'>
+                  {companies.map((company) => (
+                    <div key={company} className='flex items-center mb-2'>
+                      <input
+                        type='checkbox'
+                        id={company}
+                        value={company}
+                        checked={selectedCompanies.includes(company)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setSelectedCompanies([...selectedCompanies, company]);
+                          } else {
+                            setSelectedCompanies(selectedCompanies.filter(c => c !== company));
+                          }
+                        }}
+                        className='mr-2'
+                      />
+                      <label htmlFor={company} className='text-gray-900'>{company}</label>
+                    </div>
+                  ))}
+                </div>
+                <div className='flex justify-end gap-2 mt-4'>
+                  <button
+                    onClick={() => {
+                      setShowDeleteModal(false);
+                      setSelectedCompanies([]);
+                    }}
+                    className='bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded'
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleDeleteCompanies}
+                    className='bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded'
+                    disabled={selectedCompanies.length === 0}
+                  >
+                    Delete Selected
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
           <div className='flex justify-center gap-4 mb-8 flex-wrap'>
             {companies.map((company) => (
               <Link
