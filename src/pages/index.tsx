@@ -46,7 +46,7 @@ export default function Home() {
     setShowForm(false);
   };
 
-  const [companies, setCompanies] = useState<string[]>(['TCS', 'AMAZON', 'DELOITTE']);
+  const [companies, setCompanies] = useState<string[]>([]);
 
   useEffect(() => {
     const fetchCompanies = async () => {
