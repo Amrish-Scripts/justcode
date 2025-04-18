@@ -61,22 +61,6 @@ export default function Home() {
     setShowForm(false);
   };
 
-  const [companies, setCompanies] = useState<string[]>([]);
-
-  useEffect(() => {
-    const fetchCompanies = async () => {
-      try {
-        const companiesDoc = await getDoc(doc(firestore, 'companies', 'list'));
-        if (companiesDoc.exists()) {
-          setCompanies(companiesDoc.data().names);
-        }
-      } catch (error) {
-        console.error('Error fetching companies:', error);
-      }
-    };
-    fetchCompanies();
-  }, []);
-
   return (
     <>
       <main className='bg-dark-layer-2 min-h-screen relative'>
