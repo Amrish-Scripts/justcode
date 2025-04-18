@@ -31,7 +31,7 @@ export default function Home() {
         const companiesRef = collection(firestore, 'companies');
         const companiesSnapshot = await getDocs(companiesRef);
         const companiesList = companiesSnapshot.docs.map(doc => doc.data().name);
-        setCompanies(companiesList);
+        setCompanies(companiesList || []);
       } catch (error) {
         console.error('Error fetching companies:', error);
       }

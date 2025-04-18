@@ -12,7 +12,7 @@ import Timer from "../Timer/Timer";
 import { useRouter } from "next/router";
 import { problems } from "@/utils/problems";
 import { Problem } from "@/utils/types/problem";
-import { doc, collection, setDoc } from "firebase/firestore";
+import { doc, collection, setDoc, getDoc } from "firebase/firestore";
 
 type TopbarProps = {
 	problemPage?: boolean;
@@ -155,14 +155,14 @@ const Topbar: React.FC<TopbarProps> = ({ problemPage, setShowForm }) => {
 		}
 	};
 
-	const handleAddCompany = async (companyName: string) => {
+	const handleAddCompany = async (companyName: string, details: any) => {
 		try {
-			const companiesRef = collection(firestore, 'companies');
-			await setDoc(doc(companiesRef, companyName.toUpperCase()), {
+			const companiesRef = doc(firestore, 'companies', companyName.toUpperCase());
+			await setDoc(companiesRef, {
 				name: companyName.toUpperCase(),
-				description: companyDetails.description,
-				website: companyDetails.website,
-				founded: companyDetails.founded,
+				description: details.description,
+				website: details.website,
+				founded: details.founded,
 				createdAt: new Date().toISOString()
 			});
 			window.location.reload();
