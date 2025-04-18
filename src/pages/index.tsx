@@ -22,7 +22,22 @@ export default function Home() {
 
   const [showForm, setShowForm] = useState(false);
   const [loadingProblems, setLoadingProblems] = useState(true);
+  const [companies, setCompanies] = useState<string[]>([]);
   const hasMounted = useHasMounted();
+
+  useEffect(() => {
+    const fetchCompanies = async () => {
+      try {
+        const companiesDoc = await getDoc(doc(firestore, 'companies', 'list'));
+        if (companiesDoc.exists()) {
+          setCompanies(companiesDoc.data().names);
+        }
+      } catch (error) {
+        console.error('Error fetching companies:', error);
+      }
+    };
+    fetchCompanies();
+  }, []);
 
   if (!hasMounted) return null;
 
