@@ -3,7 +3,7 @@ import ProblemsTable from "@/components/ProblemsTable/ProblemsTable";
 import Topbar from "@/components/Topbar/Topbar";
 import { firestore } from "@/firebase/firebase";
 import useHasMounted from "@/hooks/useHasMounted";
-import { doc, setDoc } from "firebase/firestore";
+import { doc, setDoc, getDoc } from "firebase/firestore";
 import { ChangeEvent, useState, useEffect } from "react";
 
 export default function Home() {
