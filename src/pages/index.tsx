@@ -32,12 +32,14 @@ export default function Home() {
         const companiesSnapshot = await getDocs(companiesRef);
         const companiesList = companiesSnapshot.docs.map(doc => doc.data().name);
         setCompanies(companiesList || []);
+        setLoadingProblems(false);
       } catch (error) {
         console.error('Error fetching companies:', error);
+        setLoadingProblems(false);
       }
     };
     fetchCompanies();
-  }, []);
+  }, [setLoadingProblems]);
 
   if (!hasMounted) return null;
 

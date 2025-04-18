@@ -92,14 +92,6 @@ const CompanyForm: React.FC<CompanyFormProps> = ({ isOpen, onClose, onSubmit }) 
             rows={3}
           />
           <input
-            type='url'
-            name='website'
-            value={companyDetails.website}
-            onChange={handleInputChange}
-            placeholder='Website URL'
-            className='w-full mb-2 p-2 border rounded text-black'
-          />
-          <input
             type='text'
             name='founded'
             value={companyDetails.founded}
@@ -253,12 +245,14 @@ const Topbar: React.FC<TopbarProps> = ({ problemPage, setShowForm }) => {
 							Add Problem
 						</button>
 					)}
-					<button
-						className='bg-dark-fill-3 py-1.5 px-3 cursor-pointer rounded text-brand-orange hover:bg-dark-fill-2'
-						onClick={() => setShowCompanyForm(true)}
-					>
-						Add Company
-					</button>
+					{isAdmin && (
+						<button
+							className='bg-dark-fill-3 py-1.5 px-3 cursor-pointer rounded text-brand-orange hover:bg-dark-fill-2'
+							onClick={() => setShowCompanyForm(true)}
+						>
+							Add Company
+						</button>
+					)}
 				</div>
 			</div>
 			<CompanyForm
