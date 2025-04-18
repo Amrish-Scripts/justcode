@@ -3,7 +3,7 @@ import ProblemsTable from "@/components/ProblemsTable/ProblemsTable";
 import Topbar from "@/components/Topbar/Topbar";
 import { firestore } from "@/firebase/firebase";
 import useHasMounted from "@/hooks/useHasMounted";
-import { doc, setDoc, getDoc } from "firebase/firestore";
+import { doc, setDoc, collection, getDocs } from "firebase/firestore";
 import { ChangeEvent, useState, useEffect } from "react";
 
 export default function Home() {
@@ -28,10 +28,10 @@ export default function Home() {
   useEffect(() => {
     const fetchCompanies = async () => {
       try {
-        const companiesDoc = await getDoc(doc(firestore, 'companies', 'list'));
-        if (companiesDoc.exists()) {
-          setCompanies(companiesDoc.data().names);
-        }
+        const companiesRef = collection(firestore, 'companies');
+        const companiesSnapshot = await getDocs(companiesRef);
+        const companiesList = companiesSnapshot.docs.map(doc => doc.data().name);
+        setCompanies(companiesList);
       } catch (error) {
         console.error('Error fetching companies:', error);
       }

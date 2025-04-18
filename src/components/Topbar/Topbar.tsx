@@ -12,7 +12,7 @@ import Timer from "../Timer/Timer";
 import { useRouter } from "next/router";
 import { problems } from "@/utils/problems";
 import { Problem } from "@/utils/types/problem";
-import { doc, updateDoc, arrayUnion, setDoc } from "firebase/firestore";
+import { doc, collection, setDoc } from "firebase/firestore";
 
 type TopbarProps = {
 	problemPage?: boolean;
@@ -157,17 +157,15 @@ const Topbar: React.FC<TopbarProps> = ({ problemPage, setShowForm }) => {
 
 	const handleAddCompany = async (companyName: string) => {
 		try {
-			const companiesRef = doc(firestore, 'companies', 'list');
-			const companiesDoc = await getDoc(companiesRef);
-			
-			if (!companiesDoc.exists()) {
-				await setDoc(companiesRef, { names: [companyName.toUpperCase()] });
-			} else {
-				await updateDoc(companiesRef, {
-					names: arrayUnion(companyName.toUpperCase())
-				});
-			}
-      window.location.reload();
+			const companiesRef = collection(firestore, 'companies');
+			await setDoc(doc(companiesRef, companyName.toUpperCase()), {
+				name: companyName.toUpperCase(),
+				description: companyDetails.description,
+				website: companyDetails.website,
+				founded: companyDetails.founded,
+				createdAt: new Date().toISOString()
+			});
+			window.location.reload();
 		} catch (error) {
 			console.error('Error adding company:', error);
 		}
