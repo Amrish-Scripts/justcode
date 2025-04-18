@@ -28,10 +28,15 @@ export default function Home() {
   useEffect(() => {
     const fetchCompanies = async () => {
       try {
-        const companiesRef = collection(firestore, 'companies');
+        const companiesRef = collection(firestore, 'companiesDetails');
         const companiesSnapshot = await getDocs(companiesRef);
-        const companiesList = companiesSnapshot.docs.map(doc => doc.data().name);
-        setCompanies(companiesList || []);
+        const companiesList = companiesSnapshot.docs.map(doc => ({
+          name: doc.data().name,
+          description: doc.data().description,
+          website: doc.data().website,
+          founded: doc.data().founded
+        }));
+        setCompanies(companiesList.map(company => company.name) || []);
       } catch (error) {
         console.error('Error fetching companies:', error);
       }
