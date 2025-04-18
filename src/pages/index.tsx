@@ -1,11 +1,12 @@
 import Link from "next/link";
 import ProblemsTable from "@/components/ProblemsTable/ProblemsTable";
 import Topbar from "@/components/Topbar/Topbar";
-import { firestore } from "@/firebase/firebase";
+import { firestore, auth } from "@/firebase/firebase";
 import useHasMounted from "@/hooks/useHasMounted";
 import { doc, setDoc, collection, getDocs, deleteDoc, query, orderBy } from "firebase/firestore";
 import { DBProblem } from "@/utils/types/problem";
 import { ChangeEvent, useState, useEffect } from "react";
+import { useAuthState } from "react-firebase-hooks/auth";
 
 export default function Home() {
   const [inputs, setInputs] = useState({
@@ -27,6 +28,7 @@ export default function Home() {
   const [showDeleteProblemModal, setShowDeleteProblemModal] = useState(false);
   const [selectedProblems, setSelectedProblems] = useState<string[]>([]);
   const [problems, setProblems] = useState<DBProblem[]>([]);
+  const [user] = useAuthState(auth);
 
   useEffect(() => {
     const fetchProblems = async () => {
