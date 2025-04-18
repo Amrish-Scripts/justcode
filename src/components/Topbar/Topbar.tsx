@@ -12,7 +12,7 @@ import Timer from "../Timer/Timer";
 import { useRouter } from "next/router";
 import { problems } from "@/utils/problems";
 import { Problem } from "@/utils/types/problem";
-import { doc, updateDoc, arrayUnion } from "firebase/firestore";
+import { doc, updateDoc, arrayUnion, setDoc } from "firebase/firestore";
 
 type TopbarProps = {
 	problemPage?: boolean;
@@ -25,14 +25,47 @@ type CompanyFormProps = {
   onSubmit: (companyName: string) => void;
 };
 
+type CompanyDetails = {
+  name: string;
+  description: string;
+  website: string;
+  founded: string;
+};
+
 const CompanyForm: React.FC<CompanyFormProps> = ({ isOpen, onClose, onSubmit }) => {
-  const [companyName, setCompanyName] = useState('');
+  const [companyDetails, setCompanyDetails] = useState<CompanyDetails>({
+    name: '',
+    description: '',
+    website: '',
+    founded: ''
+  });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(companyName);
-    setCompanyName('');
+    onSubmit(companyDetails.name);
+
+    // Store detailed company information
+    const companyDocRef = doc(firestore, 'companiesDetails', companyDetails.name.toUpperCase());
+    setDoc(companyDocRef, {
+      ...companyDetails,
+      name: companyDetails.name.toUpperCase(),
+      createdAt: new Date().toISOString()
+    });
+
+    setCompanyDetails({
+      name: '',
+      description: '',
+      website: '',
+      founded: ''
+    });
     onClose();
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setCompanyDetails({
+      ...companyDetails,
+      [e.target.name]: e.target.value
+    });
   };
 
   if (!isOpen) return null;
@@ -43,11 +76,36 @@ const CompanyForm: React.FC<CompanyFormProps> = ({ isOpen, onClose, onSubmit }) 
         <form onSubmit={handleSubmit}>
           <input
             type='text'
-            value={companyName}
-            onChange={(e) => setCompanyName(e.target.value)}
+            name='name'
+            value={companyDetails.name}
+            onChange={handleInputChange}
             placeholder='Company Name'
             className='w-full mb-2 p-2 border rounded text-black'
             required
+          />
+          <textarea
+            name='description'
+            value={companyDetails.description}
+            onChange={handleInputChange}
+            placeholder='Company Description'
+            className='w-full mb-2 p-2 border rounded text-black'
+            rows={3}
+          />
+          <input
+            type='url'
+            name='website'
+            value={companyDetails.website}
+            onChange={handleInputChange}
+            placeholder='Website URL'
+            className='w-full mb-2 p-2 border rounded text-black'
+          />
+          <input
+            type='text'
+            name='founded'
+            value={companyDetails.founded}
+            onChange={handleInputChange}
+            placeholder='Founded Year'
+            className='w-full mb-2 p-2 border rounded text-black'
           />
           <div className='flex justify-end gap-2'>
             <button
