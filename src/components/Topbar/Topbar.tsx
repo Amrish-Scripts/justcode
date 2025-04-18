@@ -50,6 +50,9 @@ const CompanyForm: React.FC<CompanyFormProps> = ({ isOpen, onClose, onSubmit }) 
       ...companyDetails,
       name: companyDetails.name.toUpperCase(),
       createdAt: new Date().toISOString()
+    }).then(() => {
+      onClose();
+      window.location.reload();
     });
 
     setCompanyDetails({
@@ -58,7 +61,6 @@ const CompanyForm: React.FC<CompanyFormProps> = ({ isOpen, onClose, onSubmit }) 
       website: '',
       founded: ''
     });
-    onClose();
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {

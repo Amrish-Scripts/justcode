@@ -59,8 +59,8 @@ export default function Home() {
     };
 
     await setDoc(doc(firestore, "problems", inputs.id), newProblem);
-    alert("Saved to DB");
     setShowForm(false);
+    window.location.reload();
   };
 
   return (
