@@ -1,0 +1,109 @@
+./src/pages/index.tsx
+Error: 
+  x the name `companies` is defined multiple times
+    ,-[/home/runner/workspace/src/pages/index.tsx:22:1]
+ 22 | 
+ 23 |   const [showForm, setShowForm] = useState(false);
+ 24 |   const [loadingProblems, setLoadingProblems] = useState(true);
+ 25 |   const [companies, setCompanies] = useState<string[]>([]);
+    :          ^^^^|^^^^
+    :              `-- previous definition of `companies` here
+ 26 |   const hasMounted = useHasMounted();
+ 27 | 
+ 28 |   useEffect(() => {
+ 29 |     const fetchCompanies = async () => {
+ 30 |       try {
+ 31 |         const companiesDoc = await getDoc(doc(firestore, 'companies', 'list'));
+ 32 |         if (companiesDoc.exists()) {
+ 33 |           setCompanies(companiesDoc.data().names);
+ 34 |         }
+ 35 |       } catch (error) {
+ 36 |         console.error('Error fetching companies:', error);
+ 37 |       }
+ 38 |     };
+ 39 |     fetchCompanies();
+ 40 |   }, []);
+ 41 | 
+ 42 |   if (!hasMounted) return null;
+ 43 | 
+ 44 |   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+ 45 |     setInputs({
+ 46 |       ...inputs,
+ 47 |       [e.target.name]: e.target.value,
+ 48 |     });
+ 49 |   };
+ 50 | 
+ 51 |   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+ 52 |     e.preventDefault();
+ 53 |     const newProblem = {
+ 54 |       ...inputs,
+ 55 |       order: Number(inputs.order),
+ 56 |       companies: inputs.company !== "general" ? [inputs.company] : []
+ 57 |     };
+ 58 | 
+ 59 |     await setDoc(doc(firestore, "problems", inputs.id), newProblem);
+ 60 |     alert("Saved to DB");
+ 61 |     setShowForm(false);
+ 62 |   };
+ 63 | 
+ 64 |   const [companies, setCompanies] = useState<string[]>([]);
+    :          ^^^^|^^^^
+    :              `-- `companies` redefined here
+ 65 | 
+ 66 |   useEffect(() => {
+ 67 |     const fetchCompanies = async () => {
+    `----
+
+  x the name `setCompanies` is defined multiple times
+    ,-[/home/runner/workspace/src/pages/index.tsx:22:1]
+ 22 | 
+ 23 |   const [showForm, setShowForm] = useState(false);
+ 24 |   const [loadingProblems, setLoadingProblems] = useState(true);
+ 25 |   const [companies, setCompanies] = useState<string[]>([]);
+    :                     ^^^^^^|^^^^^
+    :                           `-- previous definition of `setCompanies` here
+ 26 |   const hasMounted = useHasMounted();
+ 27 | 
+ 28 |   useEffect(() => {
+ 29 |     const fetchCompanies = async () => {
+ 30 |       try {
+ 31 |         const companiesDoc = await getDoc(doc(firestore, 'companies', 'list'));
+ 32 |         if (companiesDoc.exists()) {
+ 33 |           setCompanies(companiesDoc.data().names);
+ 34 |         }
+ 35 |       } catch (error) {
+ 36 |         console.error('Error fetching companies:', error);
+ 37 |       }
+ 38 |     };
+ 39 |     fetchCompanies();
+ 40 |   }, []);
+ 41 | 
+ 42 |   if (!hasMounted) return null;
+ 43 | 
+ 44 |   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+ 45 |     setInputs({
+ 46 |       ...inputs,
+ 47 |       [e.target.name]: e.target.value,
+ 48 |     });
+ 49 |   };
+ 50 | 
+ 51 |   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+ 52 |     e.preventDefault();
+ 53 |     const newProblem = {
+ 54 |       ...inputs,
+ 55 |       order: Number(inputs.order),
+ 56 |       companies: inputs.company !== "general" ? [inputs.company] : []
+ 57 |     };
+ 58 | 
+ 59 |     await setDoc(doc(firestore, "problems", inputs.id), newProblem);
+ 60 |     alert("Saved to DB");
+ 61 |     setShowForm(false);
+ 62 |   };
+ 63 | 
+ 64 |   const [companies, setCompanies] = useState<string[]>([]);
+    :                     ^^^^^^|^^^^^
+    :                           `-- `setCompanies` redefined here
+ 65 | 
+ 66 |   useEffect(() => {
+ 67 |     const fetchCompanies = async () => {
+    `----
