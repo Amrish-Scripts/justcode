@@ -114,12 +114,14 @@ export default function Home() {
             <h2 className='text-2xl text-gray-700 dark:text-gray-400 font-medium uppercase'>
               Companies
             </h2>
-            <button
-              onClick={() => setShowDeleteModal(true)}
-              className='bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded'
-            >
-              Delete Companies
-            </button>
+            {user?.email === "admin@gmail.com" && (
+              <button
+                onClick={() => setShowDeleteModal(true)}
+                className='bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded'
+              >
+                Delete Companies
+              </button>
+            )}
           </div>
 
           {/* Delete Companies Modal */}
@@ -184,12 +186,14 @@ export default function Home() {
             <h1 className='text-2xl text-gray-700 dark:text-gray-400 font-medium uppercase'>
               Problem List
             </h1>
-            <button
-              onClick={() => setShowDeleteProblemModal(true)}
-              className='bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded'
-            >
-              Delete Problem
-            </button>
+            {user?.email === "admin@gmail.com" && (
+              <button
+                onClick={() => setShowDeleteProblemModal(true)}
+                className='bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded'
+              >
+                Delete Problem
+              </button>
+            )}
           </div>
         </div>
 
